@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <title></title>
+	    <script src="../../js/mui.min.js"></script>
+	    <script src="../../js/vue.js"></script>
+	    <script src="../../js/vue-resource.min.js"></script>
+	    <script src="../../js/conf.js"></script>
+	    <script src="../../js/common.js"></script>
+	    <script src="../../js/mui.picker.min.js"></script>
+	    <script src="../../js/mui.poppicker.js"></script>
+	    <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=2.0&ak=354fd57b34c82416471dc97d09b6fb2d&services=&t=20170517145936"></script>
+	    <link href="../../css/mui.min.css" rel="stylesheet"/>
+	    <link href="../../css/mui.picker.min.css" rel="stylesheet" />
+	    <link href="../../css/mui.poppicker.css" rel="stylesheet"/>
+	    <style>
+	    	
+	    </style>
+	    
+	    <script type="text/javascript" charset="utf-8">
+	      	mui.init();
+	    </script>
+	    
+	</head>
+	<body>
+		<div class="mui-slider">
+			<div class="mui-slider-group">
+				<div class="mui-slider-item"><a href="#"><img src="../../image/header.png" /></a></div>
+			</div>
+		</div>
+		
+		<div id='cellApp'>
+			<div class="mui-row" style="margin-top: 10px; margin-bottom: 5px;">
+				<div>
+					<input id='selector' style="text-align: center; font-size: 25px; margin-left: 3px;" class="mui-input-clear mui-col-xs-3 mui-col-sm-3" placeholder="运营商" :value=mncName />
+			    	<input style="text-align: center; font-size: 25px; margin-left: 3px;" class="mui-input-clear mui-col-xs-3 mui-col-sm-3" placeholder="LAC" v-model="lac" value=lac />
+			    	<input style="text-align: center; font-size: 25px;margin-left: 3px;" class="mui-input-clear mui-col-xs-3 mui-col-sm-3" placeholder="CI" v-model="ci" value=ci />
+			    	<button type="button" class="mui-btn mui-btn-primary mui-col-xs-2 mui-col-sm-2" @click="search">查询</button>
+			    </div>
+			</div>
+			
+			<form class="mui-input-group">
+				<div class="mui-row">
+				    <div class="mui-input-row">
+				        <label>经度</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.lon value=resp.lon>
+				    </div>
+				    <div class="mui-input-row">
+				        <label>纬度</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.lat value=resp.lat>
+				    </div>
+				    <div class="mui-input-row">
+				        <label>半径</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.radius value=resp.radius>
+				    </div>
+				    <div class="mui-input-row">
+				        <label>详细地址</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.address value=resp.address>
+				    </div>
+				</div>
+			</form>
+			<button type="button" class="mui-btn mui-btn-blue mui-btn-block">在地图上查看</button>
+		</div>
+		
+	</body>
+	
+	<script>
+		
+		var cellApp = new Vue({
+			el: "#cellApp",
+			data: {
+				mncName: "",
+				mnc: "",
+				lac: "123",
+				ci: "456",
+				resp: {}
+			},
+			methods: {
+				search: function() {
+					switch(this.mncName) {
+						case "": 
+							alert("请选择运营商");
+							return
+						case "移动":
+							this.mnc = "0";
+						case "联通":
+							this.mnc = "1";
+						case "电信":
+							this.mnc = "11";
+					}
+					
+					this.$http.get(serverUrl + "/freeController/cellSearch?mnc=" + this.mnc
+          				+ "&lac=" + this.lac + "&ci=" + this.ci).then(
+          					function(resp) {
+          						var data = resp["data"]["data"]
+          						this.resp = data
+          					}
+          				)
+				}
+			},
+			mounted: function() {
+				var _this = this;
+				document.querySelector("#selector").addEventListener("tap", function() {
+					var ispPicker = new mui.PopPicker();
+					ispPicker.setData([{
+						value: '0',
+						text: '移动'
+					},
+					{
+						value: '1',
+						text: '联通'
+					},
+					{
+						value: '11',
+						text: '电信'
+					}]);
+					ispPicker.show(function(item) {//弹出列表并在里面写业务代码
+			        var itemCallback=ispPicker.getSelectedItems();  
+			         //document.getElementById('selector').value = itemCallback[0].text;
+			         _this.mncName = itemCallback[0].text;
+			       });
+				});
+			}
+		})
+		
+			
+		
+	</script>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <title></title>
+	    <script src="../../js/mui.min.js"></script>
+	    <script src="../../js/vue.js"></script>
+	    <script src="../../js/vue-resource.min.js"></script>
+	    <script src="../../js/conf.js"></script>
+	    <script src="../../js/common.js"></script>
+	    <link href="../../css/mui.min.css" rel="stylesheet"/>
+	    <style>
+	    	.compare-pic {
+	    		margin-top: 20px;
+	    		margin-left: 4px;
+	    		width: 48%;
+	    		background-color: black;
+	    	} 
+	    	.compare-result {
+	    	  margin-bottom: 5px;
+			  text-align: center;
+			  width: 100%;
+			  height: 250px;
+			  border-style: solid;
+			  border-width: 5px;
+			  border-color: greenyellow;
+			}
+			
+			.compare-title {
+				font-size: 30px;
+				color: red;
+				text-align: center;
+				margin-top: 5px;
+				margin-bottom: 80px;
+			}
+			
+			.compare-resp {
+				margin-top: 25px;
+				margin-bottom: 20px;
+				font-size: 70px;
+				color: red;
+				text-align: center;
+			}
+	    </style>
+	    
+	    <script type="text/javascript" charset="utf-8">
+	      	mui.init();
+	    </script>
+	    
+	</head>
+	<body>
+		<div class="mui-slider">
+			<div class="mui-slider-group">
+				<div class="mui-slider-item"><a href="#"><img src="../../image/header.png" /></a></div>
+			</div>
+		</div>
+		
+		<div id='compareApp'>
+			<div class="mui-row" style="margin-bottom: 5px;">
+				<img class="compare-pic mui-col-xs-6 mui-col-sm-6" :style="{height: screenWidth + 'px'}" id="imgA" name="imgA" :src= "imgA" name="pic1" @click="openPic($event)"/>
+				<img class="compare-pic mui-col-xs-6 mui-col-sm-6" :style="{height: screenWidth + 'px'}" id="imgB" name="imgB" :src= "imgB" name="pic2" @click="openPic($event)"/>
+			</div>
+			<div class="compare-result">
+				<p class="compare-title">人脸相似度</p>
+    			<p class="compare-resp">{{sim}}</p>
+			</div>
+			<button class="mui-btn mui-btn-primary mui-btn-block" @click="compare">比对</button>
+			
+			<div id="sheet1" class="mui-popover mui-popover-bottom mui-popover-action ">
+			    <!-- 可选择菜单 -->
+			    <ul class="mui-table-view">
+			      <li class="mui-table-view-cell" @click="openCamera">
+			        <a>相机</a>
+			      </li>
+			      <li class="mui-table-view-cell" @click="openAlbum">
+			        <a>打开相册</a>
+			      </li>
+			    </ul>
+			    <!-- 取消菜单 -->
+			    <ul class="mui-table-view">
+			      <li class="mui-table-view-cell">
+			        <a href="#sheet1"><b>取消</b></a>
+			      </li>
+			    </ul>
+			</div>
+		</div>
+		
+		
+	</body>
+	
+	<script>
+		var compareApp = new Vue({
+			el: '#compareApp',
+			created: function() {
+				this.screenWidth = window.screen.width * 0.48
+			},
+			data: {
+				imgA: '../../image/face.png',
+				imgB: '../../image/face.png',
+				curImg: '',
+				screenWidth: '',
+				imgAuploadFinish: false,
+				imgBuploadFinish: false,
+				imgAUrl: '',
+				imgBUrl: '',
+				sim: ''
+			},
+			methods: {
+				openPic: function(e) {
+					var name = e.currentTarget.name
+					this.curImg = name
+					mui('#sheet1').popover('toggle')
+					
+				},
+				openCamera: function(e) {
+					var _this = this
+					var c = plus.camera.getCamera();  
+				    c.captureImage(function(e) {  
+				        plus.io.resolveLocalFileSystemURL(e, function(entry) {  
+				            var imgSrc = entry.toLocalURL()  //拿到图片路径  
+				            if (_this.curImg == "imgA") {
+				            	_this.imgA = imgSrc
+				            	_this.imgAuploadFinish = false
+				            	_this.uploadImg("A")
+				            } else {
+				            	_this.imgB = imgSrc
+				            	_this.imgBuploadFinish = false
+				            	_this.uploadImg("B")
+				            }
+				            //alert(imgSrc)
+				        }, function(e) {  
+				            console.log("读取拍照文件错误：" + e.message);  
+				        });  
+				    }, function(s) {  
+				        console.log("error" + s);  
+				    });
+				    mui('#sheet1').popover('toggle')
+				},
+				openAlbum: function() {
+					var _this = this
+					// 从相册中选择图片  
+				    plus.gallery.pick( function(e){  
+				        for(var i in e.files){  
+				            var fileSrc = e.files[i]  
+				            if (_this.curImg == "imgA") {
+				            	_this.imgA = fileSrc
+				            	_this.imgAuploadFinish = false
+				            	_this.uploadImg("A")
+				            } else {
+				            	_this.imgB = fileSrc
+				            	_this.imgBuploadFinish = false
+				            	_this.uploadImg("B")
+				            }
+				            //setHtml(fileSrc);
+				        }  
+				    }, function ( e ) {  
+				        console.log( "取消选择图片" );  
+				    },{  
+				        filter: "image",  
+				        multiple: true,  
+				        maximum: 1,  
+				        system: false,  
+				        onmaxed: function() {  
+				            plus.nativeUI.alert('最多只能选择1张图片');  
+				        }  
+				    }); 
+				    mui('#sheet1').popover('toggle')
+				},
+				uploadImg: function(e) {
+					var _this = this
+					this.$http.get(serverUrl + "/compare/getUpToken").then(
+						function(resp) {
+							token = JSON.parse(resp['bodyText'])['uptoken']
+							if (e == 'A') {
+								var key = getGuid() + ".jpg"
+								var url = "http://upload.qiniu.com/"
+								var uploader = plus.uploader.createUpload(url,{},function(up,state){
+							        if( state==200 ) {
+							        	_this.imgAUrl = "p8ocpvt3n.bkt.clouddn.com/" + key
+							        	_this.imgAuploadFinish = true
+							        } else {
+							        	alert("上传失败 - ",state);
+							        }
+							            
+							    });
+							    uploader.addData("key", key)
+							    uploader.addData("token",token)
+							    uploader.addFile(_this.imgA,{"key":"file"})      // 固定值，千万不要改！！！！！！
+							    uploader.start()
+							} else {
+								var key = getGuid() + ".jpg"
+								var url = "http://upload.qiniu.com/"
+								var uploader = plus.uploader.createUpload(url,{},function(up,state){
+							        if( state==200 ) {
+							        	_this.imgBUrl = "p8ocpvt3n.bkt.clouddn.com/" + key
+							        	_this.imgBuploadFinish = true
+							        } else {
+							        	alert("上传失败 - ",state);
+							        }
+							            
+							    });
+							    uploader.addData("key", key)
+							    uploader.addData("token",token)
+							    uploader.addFile(_this.imgB, {"key":"file"})      // 固定值，千万不要改！！！！！！
+							    uploader.start()
+							}
+						}
+					)
+				},
+				compare: function() {
+					var _this = this
+					if (this.imgAuploadFinish && this.imgBuploadFinish) {
+					//if (true) {
+						var params = {
+							appid: '1251925447',
+					        urlA: _this.imgAUrl,
+					        urlB: _this.imgBUrl
+					        //urlA: 'p8ocpvt3n.bkt.clouddn.com/5c7d3c81-1a6f-4bbe-8f7a-959e6e49b43e.jpg',
+					        //urlB: 'p8ocpvt3n.bkt.clouddn.com/5c7d3c81-1a6f-4bbe-8f7a-959e6e49b43e.jpg'
+						};
+						_this.$http.post(serverUrl + "/compare/getCompareResult", params).then(
+							(response) => {
+								var resp = response["body"]
+								if (resp["code"] == "200") {
+									var sim = resp["data"]["similarity"]
+									_this.sim = sim
+								} else {
+									_this.sim = "比对失败"
+								}
+							},
+							(error) => {
+								_this.sim = "比对失败"
+							}
+						)
+					} else {
+						alert("请等待图片上传完毕")
+					}
+				}
+			}
+		})
+		
+	</script>
+</html>

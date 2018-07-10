@@ -1,0 +1,15 @@
+.menu-icon {
+  margin-top: 5px;
+  margin-left: 7.5px;
+  width: 75px;
+  height: 75px;
+  background-color: grey;
+  border-radius: 15px;
+  
+}
+
+.menu-text {
+  margin-left: 15px;
+  font-size: 15px;
+  color: black;
+}

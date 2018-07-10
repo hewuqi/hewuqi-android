@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <title></title>
+	    <script src="../../js/mui.min.js"></script>
+	    <script src="../../js/vue.js"></script>
+	    <link href="../../css/mui.min.css" rel="stylesheet"/>
+	    <link href="home.css" rel="stylesheet"/>
+			<style>
+				.menu-box {
+					text-align: center;
+				}
+				
+			</style>
+	    <script type="text/javascript" charset="utf-8">
+	      	mui.init();
+	    </script>
+	</head>
+	<body>
+		<div class="mui-slider">
+			<div class="mui-slider-group">
+				<div class="mui-slider-item"><a href="#"><img src="../../image/header.png " /></a></div>
+			</div>
+		</div>
+		<div id="homeAppa">
+			<ul class="mui-table-view mui-grid-view mui-grid-9">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" v-for="menu in menus">
+						<div class="menu-box">
+							<img class="menu-icon" :src="menu.icon" :name="menu.name" v-on:click="hello($event)" />
+							<div class="mui-media-body">{{menu.title}}</div>
+						</div>
+				</li>
+		   </ul>
+		</div>
+
+		<div id="bottomApp">
+			<nav class="mui-bar mui-bar-tab">
+			    <a class="mui-tab-item mui-active" @click="test">
+			        <span class="mui-icon mui-icon-home"></span>
+			        <span class="mui-tab-label">首页</span>
+			    </a>
+			    <a class="mui-tab-item">
+			        <span class="mui-icon mui-icon-chatboxes"></span>
+			        <span class="mui-tab-label">大厅</span>
+			    </a>
+			    <a class="mui-tab-item" >
+			        <span class="mui-icon mui-icon-contact"></span>
+			        <span class="mui-tab-label">个人中心</span>
+			    </a>
+			</nav>
+		</div>
+		
+		<!--<div class="mui-content">
+			<div id="homeApp">
+			    <div class="mui-row">
+			        <div class="mui-col-xs-3 mui-col-sm-3" v-for="menu in menus">
+		        		<img class="menu-icon" :src="menu.icon" :name="menu.name" v-on:click="hello($event)" />
+		        		<p class="menu-text">{{menu.title}}</p>
+			        </div>
+			        
+				</div>
+			</div>
+		</div>-->
+	</body>
+	
+	<script>
+		var homeApp = new Vue({
+			el: '#homeAppa',
+			data: {
+				menus: [{
+						icon: '../../image/menu/compare.png',
+						title: '人脸比对',
+						name: "compare"
+					},
+					{
+						icon: '../../image/menu/station.png',
+						title: '基站查询',
+						name: 'cell'
+					},
+					{
+						icon: '../../image/menu/ip.png',
+						title: 'IP 查询',
+						name: 'ip'
+					},
+					{
+						icon: '../../image/menu/payCard.png',
+						title: '银行卡查询',
+						name: 'card'
+					},
+				
+				]
+				
+			},
+			methods: {
+				hello: function(e) {
+					var name = e.currentTarget.name
+					switch(name) {
+						case 'compare': 
+							mui.openWindow({
+								url: '../compare/compare.html'
+							})
+							break
+						case 'cell':
+							mui.openWindow({
+								url: '../cell/cell.html'
+							})
+							break;
+						case 'ip':
+							alert('ip')
+							break;
+						case 'card':
+							alert('card')
+							break
+					}
+				}
+			}
+		})
+		
+		var bottomApp = new Vue({
+			el: '#bottomApp',
+			data: {
+				menus: [
+				]
+				
+			},
+			methods: {
+				test: function(e) {
+					alert('Hello World')
+				}
+			}
+		})
+		
+	</script>
+</html>
