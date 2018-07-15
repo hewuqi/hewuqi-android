@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <title></title>
+	    <script src="../../js/mui.min.js"></script>
+	    <script src="../../js/vue.js"></script>
+	    <script src="../../js/vue-resource.min.js"></script>
+		<script src="../../js/vue-router.min.js"></script>
+	    <script src="../../js/conf.js"></script>
+	    <script src="../../js/common.js"></script>
+	    <script src="../../js/mui.picker.min.js"></script>
+	    <script src="../../js/mui.poppicker.js"></script>
+	    <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=2.0&ak=354fd57b34c82416471dc97d09b6fb2d&services=&t=20170517145936"></script>
+	    <link href="../../css/mui.min.css" rel="stylesheet"/>
+	    <link href="../../css/mui.picker.min.css" rel="stylesheet" />
+	    <link href="../../css/mui.poppicker.css" rel="stylesheet"/>
+		<link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8"/>
+	    <style>
+			#map {
+				width: 100%;
+				position: fixed;
+				top: 45px;
+				bottom: 0px;
+				line-height: 200px;
+				text-align: center;
+				background: #FFFFFF;
+			}
+	    	
+	    </style>
+	    
+	    <script type="text/javascript" charset="utf-8">
+	      	mui.init();
+	    </script>
+	    
+	</head>
+	
+	<body>
+		<header id="header">
+			<div class="nvbt iback" onclick="back()"></div>
+			<div class="nvtt">立足实战，服务一线</div>
+		</header>
+		<div id="map">地图加载中...</div>
+	</body>
+	
+	<script>
+		//var lon = getUrlParam("lon")
+		//var lat = getUrlParam("lat")
+		
+		function plusReady(){
+			var self = plus.webview.currentWebview()
+			var lon = self.lon
+			var lat = self.lat
+			//高德地图坐标为(116.3974357341,39.9085574220), 百度地图坐标为(116.3975,39.9074)
+			pcenter = new plus.maps.Point(lon, lat)
+			setTimeout(function(){
+				map=new plus.maps.Map("map");
+				map.centerAndZoom(pcenter, 15);
+				
+				var marker=new plus.maps.Marker(new plus.maps.Point(lon,lat));
+				marker.setIcon("../../image/logo.png");
+				map.addOverlay(marker);
+				
+			},300);
+			
+		}
+ 		if(window.plus){
+ 			plusReady();
+ 		}else{
+ 			document.addEventListener("plusready",plusReady,false);
+ 		}
+		
+		function getUrlParam(key) {
+			var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)", "i"); 
+			var r = window.location.search.substr(1).match(reg); 
+			if (r != null) return unescape(r[2]); 
+			return null; 
+		}
+
+	</script>
+</html>

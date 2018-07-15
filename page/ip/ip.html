@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <title></title>
+	    <script src="../../js/mui.min.js"></script>
+	    <script src="../../js/vue.js"></script>
+	    <script src="../../js/vue-resource.min.js"></script>
+		<script src="../../js/vue-router.min.js"></script>
+	    <script src="../../js/conf.js"></script>
+	    <script src="../../js/common.js"></script>
+	    <script src="../../js/mui.picker.min.js"></script>
+	    <script src="../../js/mui.poppicker.js"></script>
+	    <link href="../../css/mui.min.css" rel="stylesheet"/>
+	    <link href="../../css/mui.picker.min.css" rel="stylesheet" />
+	    <link href="../../css/mui.poppicker.css" rel="stylesheet"/>
+	    <style>
+	    	
+	    </style>
+	    
+	    <script type="text/javascript" charset="utf-8">
+	      	mui.init();
+	    </script>
+	    
+	</head>
+	<body>
+		<div class="mui-slider">
+			<div class="mui-slider-group">
+				<div class="mui-slider-item"><a href="#"><img src="../../image/header.png" /></a></div>
+			</div>
+		</div>
+		
+		<div id='cardApp'>
+			<div class="mui-row" style="margin-top: 10px; margin-bottom: 5px;">
+				<div>
+					<div class="mui-input-row">
+						<input style="font-size: 25px;margin-left: 3px;" class="mui-input-clear mui-col-xs-10 mui-col-sm-10" placeholder="请输入ip地址" v-model="ip" value=ip>
+						<button type="button" class="mui-btn mui-btn-primary" @click="search">查询</button>
+					</div>
+			    </div>
+			</div>
+			
+			<form class="mui-input-group">
+				<div class="mui-row">
+				    <div class="mui-input-row">
+				        <label>国家</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.country value=resp.country>
+				    </div>
+				    <div class="mui-input-row">
+				        <label>区域</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.area value=resp.area>
+				    </div>
+				    <div class="mui-input-row">
+				        <label>所属省</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.region value=resp.region>
+				    </div>
+				    <div class="mui-input-row">
+				        <label>地区</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.city value=resp.city>
+				    </div>
+					<div class="mui-input-row">
+						<label>街道</label>
+						<input type="text" class="mui-input-clear" placeholder="" v-model=resp.county value=resp.county>
+					</div>
+					<div class="mui-input-row">
+						<label>运营商</label>
+						<input type="text" class="mui-input-clear" placeholder="" v-model=resp.isp value=resp.isp>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+	</body>
+	<script>
+		var cardApp = new Vue({
+			el: "#cardApp",
+			data: {
+				ip: "",
+				resp: {}
+			},
+			methods: {
+				search: function() {
+					this.$http.get(serverUrl + "/freeController/ipSearch?ip=" + this.ip).then(
+          					function(resp) {
+          						var data = resp["data"]["data"]
+          						this.resp = data
+          					}
+          				)
+				}
+			}
+		})
+		
+			
+		
+	</script>
+</html>

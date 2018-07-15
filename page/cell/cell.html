@@ -7,11 +7,11 @@
 	    <script src="../../js/mui.min.js"></script>
 	    <script src="../../js/vue.js"></script>
 	    <script src="../../js/vue-resource.min.js"></script>
+			<script src="../../js/vue-router.min.js"></script>
 	    <script src="../../js/conf.js"></script>
 	    <script src="../../js/common.js"></script>
 	    <script src="../../js/mui.picker.min.js"></script>
 	    <script src="../../js/mui.poppicker.js"></script>
-	    <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=2.0&ak=354fd57b34c82416471dc97d09b6fb2d&services=&t=20170517145936"></script>
 	    <link href="../../css/mui.min.css" rel="stylesheet"/>
 	    <link href="../../css/mui.picker.min.css" rel="stylesheet" />
 	    <link href="../../css/mui.poppicker.css" rel="stylesheet"/>
@@ -61,21 +61,22 @@
 				    </div>
 				</div>
 			</form>
-			<button type="button" class="mui-btn mui-btn-blue mui-btn-block">在地图上查看</button>
+			<button type="button" class="mui-btn mui-btn-blue mui-btn-block" @click="goToMap">在地图上查看</button>
 		</div>
 		
 	</body>
 	
 	<script>
-		
+		var router = new VueRouter();
 		var cellApp = new Vue({
 			el: "#cellApp",
 			data: {
 				mncName: "",
 				mnc: "",
-				lac: "123",
-				ci: "456",
-				resp: {}
+				lac: "",
+				ci: "",
+				resp: {},
+				router: router
 			},
 			methods: {
 				search: function() {
@@ -90,7 +91,6 @@
 						case "电信":
 							this.mnc = "11";
 					}
-					
 					this.$http.get(serverUrl + "/freeController/cellSearch?mnc=" + this.mnc
           				+ "&lac=" + this.lac + "&ci=" + this.ci).then(
           					function(resp) {
@@ -98,6 +98,22 @@
           						this.resp = data
           					}
           				)
+				},
+				
+				goToMap: function() {
+					if (this.resp.lon == null || this.resp.lat == null) {
+						alert("请先点击查询按钮");
+						return;
+					}
+					//window.location.href="map.html?lon=" + this.resp.lon + "&lat=" + this.resp.lat
+					mui.openWindow({
+						url: 'map.html',
+						id: 'map.html',
+						extras:{
+							lon:this.resp.lon,
+							lat:this.resp.lat
+						}
+					})
 				}
 			},
 			mounted: function() {
