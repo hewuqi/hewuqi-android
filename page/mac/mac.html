@@ -36,11 +36,11 @@
 		<div id='cellApp'>
 			<div class="mui-row" style="margin-top: 10px; margin-bottom: 5px;">
 				<div>
-					<input id='selector' style="text-align: center; font-size: 25px; margin-left: 3px;" class="mui-input-clear mui-col-xs-3 mui-col-sm-3" placeholder="运营商" :value=mncName />
-			    	<input style="text-align: center; font-size: 25px; margin-left: 3px;" class="mui-input-clear mui-col-xs-3 mui-col-sm-3" placeholder="LAC" v-model="lac" value=lac />
-			    	<input style="text-align: center; font-size: 25px;margin-left: 3px;" class="mui-input-clear mui-col-xs-3 mui-col-sm-3" placeholder="CI" v-model="ci" value=ci />
-			    	<button type="button" data-loading-text="查询中" class="mui-btn mui-btn-primary mui-col-xs-2 mui-col-sm-2" @click="search">查询</button>
+					<div class="mui-input-row">
+						<input style="font-size: 25px;margin-left: 3px;" class="mui-input-clear mui-col-xs-10 mui-col-sm-10" placeholder="请输入MAC地址" v-model="mac" value=mac>
+						<button type="button" class="mui-btn mui-btn-primary" @click="search">查询</button>
 			    </div>
+				</div>
 			</div>
 			
 			<form class="mui-input-group">
@@ -53,14 +53,10 @@
 				        <label>纬度</label>
 				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.lat value=resp.lat>
 				    </div>
-				    <div class="mui-input-row">
-				        <label>半径</label>
-				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.radius value=resp.radius>
-				    </div>
-				    <div class="mui-input-row">
-				        <label>详细地址</label>
-				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.address value=resp.address>
-				    </div>
+						<div class="mui-input-row">
+								<label>详情地址</label>
+							<input type="text" class="mui-input-clear" placeholder="" v-model=resp.address value=resp.address>
+						</div>
 				</div>
 			</form>
 			<button type="button" class="mui-btn mui-btn-blue mui-btn-block" @click="goToMap">在地图上查看</button>
@@ -73,10 +69,8 @@
 		var cellApp = new Vue({
 			el: "#cellApp",
 			data: {
-				mncName: "",
-				mnc: "",
+				mac: "",
 				lac: "",
-				ci: "",
 				resp: {},
 				router: router
 			},
@@ -84,25 +78,13 @@
 				search: function() {
 					this.resp = {}
 					mui.showLoading("正在查询，请稍候", "div")
-					switch(this.mncName) {
-						case "": 
-							alert("请选择运营商");
-							return
-						case "移动":
-							this.mnc = "0";
-						case "联通":
-							this.mnc = "1";
-						case "电信":
-							this.mnc = "11";
-					}
-					this.$http.get(serverUrl + "/freeController/cellSearch?mnc=" + this.mnc
-          				+ "&lac=" + this.lac + "&ci=" + this.ci).then(
+					this.$http.get(serverUrl + "/freeController/macSearch?mac=" + this.mac).then(
           					function(resp) {
           						var data = resp["data"]["data"]
           						this.resp = data
 											mui.hideLoading()
           					}
-          				)
+          )
 				},
 				
 				goToMap: function() {
@@ -120,29 +102,6 @@
 						}
 					})
 				}
-			},
-			mounted: function() {
-				var _this = this;
-				document.querySelector("#selector").addEventListener("tap", function() {
-					var ispPicker = new mui.PopPicker();
-					ispPicker.setData([{
-						value: '0',
-						text: '移动'
-					},
-					{
-						value: '1',
-						text: '联通'
-					},
-					{
-						value: '11',
-						text: '电信'
-					}]);
-					ispPicker.show(function(item) {//弹出列表并在里面写业务代码
-			        var itemCallback=ispPicker.getSelectedItems();  
-			         //document.getElementById('selector').value = itemCallback[0].text;
-			         _this.mncName = itemCallback[0].text;
-			       });
-				});
 			}
 		})
 		

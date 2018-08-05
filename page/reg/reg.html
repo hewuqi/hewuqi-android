@@ -59,6 +59,10 @@
 					<label>邮箱</label>
 					<input id='email' type="email" class="mui-input-clear mui-input" placeholder="请输入邮箱" v-model="email">
 				</div>
+				<div class="mui-input-row">
+					<label>激活码</label>
+					<input id='activeCode' type="text" class="mui-input-clear mui-input" placeholder="请输入激活码" v-model="activeCode">
+				</div>
 			</form>
 			<div class="mui-content-padded">
 				<button id='reg' class="mui-btn mui-btn-block mui-btn-primary" v-on:click="regist">注册</button>
@@ -80,7 +84,8 @@
 					username: '',
 					passwordA: '',
 					passwordB: '',
-					email: ''
+					email: '',
+					activeCode:''
 				},
 				methods: {
 					checkPasswordVaild: function() {

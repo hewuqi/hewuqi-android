@@ -9,12 +9,14 @@
 	    <script src="../../js/vue-resource.min.js"></script>
 		<script src="../../js/vue-router.min.js"></script>
 	    <script src="../../js/conf.js"></script>
-	    <script src="../../js/common.js"></script>
+	    <!--<script src="../../js/common.js"></script>-->
 	    <script src="../../js/mui.picker.min.js"></script>
 	    <script src="../../js/mui.poppicker.js"></script>
+		<script src="../../js/loading.js"></script>
 	    <link href="../../css/mui.min.css" rel="stylesheet"/>
 	    <link href="../../css/mui.picker.min.css" rel="stylesheet" />
 	    <link href="../../css/mui.poppicker.css" rel="stylesheet"/>
+		<link href="../../css/loading.css" rel="stylesheet"/>
 	    <style>
 	    	
 	    </style>
@@ -81,10 +83,13 @@
 			},
 			methods: {
 				search: function() {
+					this.resp={}
+					mui.showLoading()
 					this.$http.get(serverUrl + "/freeController/ipSearch?ip=" + this.ip).then(
           					function(resp) {
           						var data = resp["data"]["data"]
           						this.resp = data
+								mui.hideLoading()
           					}
           				)
 				}

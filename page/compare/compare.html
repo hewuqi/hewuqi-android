@@ -9,7 +9,9 @@
 	    <script src="../../js/vue-resource.min.js"></script>
 	    <script src="../../js/conf.js"></script>
 	    <script src="../../js/common.js"></script>
+			<script src="../../js/loading.js"></script>
 	    <link href="../../css/mui.min.css" rel="stylesheet"/>
+			<link href="../../css/loading.css" rel="stylesheet" />
 	    <style>
 	    	.compare-pic {
 	    		margin-top: 20px;
@@ -90,6 +92,14 @@
 	</body>
 	
 	<script>
+		
+		function getGuid() {
+		    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+		        return v.toString(16);
+		    });
+		}
+		
 		var compareApp = new Vue({
 			el: '#compareApp',
 			created: function() {
@@ -180,7 +190,7 @@
 							        	_this.imgAUrl = "p8ocpvt3n.bkt.clouddn.com/" + key
 							        	_this.imgAuploadFinish = true
 							        } else {
-							        	alert("上传失败 - ",state);
+							        	alert("上传失败",state);
 							        }
 							            
 							    });
@@ -196,7 +206,7 @@
 							        	_this.imgBUrl = "p8ocpvt3n.bkt.clouddn.com/" + key
 							        	_this.imgBuploadFinish = true
 							        } else {
-							        	alert("上传失败 - ",state);
+							        	alert("上传失败",state);
 							        }
 							            
 							    });
@@ -209,6 +219,8 @@
 					)
 				},
 				compare: function() {
+					this.resp = {}
+					mui.showLoading("正在查询，请稍候", "div")
 					var _this = this
 					if (this.imgAuploadFinish && this.imgBuploadFinish) {
 					//if (true) {
@@ -221,6 +233,7 @@
 						};
 						_this.$http.post(serverUrl + "/compare/getCompareResult", params).then(
 							(response) => {
+								mui.hideLoading()
 								var resp = response["body"]
 								if (resp["code"] == "200") {
 									var sim = resp["data"]["similarity"]

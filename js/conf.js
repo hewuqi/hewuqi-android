@@ -4,3 +4,4 @@ const qiniuConfig = {
 }
 //const serverUrl = "https://115.29.33.119"
 const serverUrl = "http://127.0.0.1"
+//const serverUrl = "http://106.12.18.116"

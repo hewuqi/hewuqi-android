@@ -37,7 +37,10 @@
         },
         "Speech": {
             "description": "管理语音识别插件"
-        }
+        },
+		"Zip": 	{
+			"description": "压缩与解压"
+		}
 	},
 	"plus": {
 		"splashscreen": {

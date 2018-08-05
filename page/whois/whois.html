@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <title></title>
+	    <script src="../../js/mui.min.js"></script>
+	    <script src="../../js/vue.js"></script>
+	    <script src="../../js/vue-resource.min.js"></script>
+			<script src="../../js/vue-router.min.js"></script>
+	    <script src="../../js/conf.js"></script>
+			<!--此js有bug，引用后input内容无法复制-->
+	    <!--<script src="../../js/common.js"></script>--> 
+	    <script src="../../js/mui.picker.min.js"></script>
+	    <script src="../../js/mui.poppicker.js"></script>
+			<script src="../../js/loading.js"></script>
+	    <link href="../../css/mui.min.css" rel="stylesheet"/>
+	    <link href="../../css/mui.picker.min.css" rel="stylesheet" />
+	    <link href="../../css/mui.poppicker.css" rel="stylesheet"/>
+			<link href="../../css/loading.css" rel="stylesheet"/>
+			
+	    <script type="text/javascript" charset="utf-8">
+	      	mui.init();
+	    </script>
+	    
+	</head>
+	<body>
+		<div class="mui-slider">
+			<div class="mui-slider-group">
+				<div class="mui-slider-item"><a href="#"><img src="../../image/header.png" /></a></div>
+			</div>
+		</div>
+		
+		<div id='whoisApp'>
+			<div class="mui-row" style="margin-top: 10px; margin-bottom: 5px;">
+					<div class="mui-input-row">
+						<input style="font-size: 25px;margin-left: 3px;" class="mui-input-clear mui-col-xs-10 mui-col-sm-10" placeholder="请输入查询网址" v-model="address" value=address>
+						<button type="button" class="mui-btn mui-btn-primary" @click="search">查询</button>
+			    </div>
+			</div>
+			
+			<form class="mui-input-group">
+				<div class="mui-row">
+				    <div class="mui-input-row">
+				    		<label>主体名称</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.comName value=resp.comName>
+				    </div>
+				    <div class="mui-input-row">
+				    		<label>备案类型</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.type value=resp.type>
+				    </div>
+				    <div class="mui-input-row">
+				    		<label>网站名称</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.sysName value=resp.sysName>
+				    </div>
+				    <div class="mui-input-row">
+				    		<label>备案编号</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.num value=resp.num>
+				    </div>
+				    <div class="mui-input-row">
+				    		<label>审核时间</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.updateTime value=resp.updateTime>
+				    </div>
+				    <div class="mui-input-row">
+				    		<label>备案地址</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.address value=resp.address>
+				    </div>
+				    <div class="mui-input-row">
+				    		<label>主域名</label>
+				    	<input type="text" class="mui-input-clear" placeholder="" v-model=resp.domain value=resp.domain>
+				    </div>
+				</div>
+			</form>
+			
+		</div>
+		
+	</body>
+	
+	<script>
+		var cellApp = new Vue({
+			el: "#whoisApp",
+			data: {
+				address: "",
+				resp: {}
+			},
+			methods: {
+				search: function() {
+					this.resp = {}
+					mui.showLoading("正在查询，请稍候", "div")
+					this.$http.get(serverUrl + "/freeController/whoisSearch?address=" + this.address).then(
+          					function(resp) {
+          						var data = resp["data"]["data"]
+          						this.resp = data
+											mui.hideLoading()
+          					}
+          				)
+				}
+			}
+		})
+		
+	</script>
+</html>

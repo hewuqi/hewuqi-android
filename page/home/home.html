@@ -89,7 +89,26 @@
 						title: '银行卡查询',
 						name: 'card'
 					},
-				
+// 					{
+// 						icon: '../../image/menu/ocr.png',
+// 						title: '拍图识字',	
+// 						name: 'ocr'
+// 					},
+					{
+						icon: '../../image/menu/mac.png',
+						title: 'MAC查询',
+						name: 'mac'
+					},
+					{
+						icon: '../../image/menu/whois.png',
+						title: '网站备案',
+						name: 'whois'
+					},
+					{
+						icon: '../../image/menu/zhuitao.png',
+						title: '追逃助手',
+						name: 'zhuitao'
+					},
 				]
 				
 			},
@@ -116,7 +135,22 @@
 							mui.openWindow({
 								url: '../card/card.html'
 							})
-							break
+							break;
+						case 'ocr':
+							mui.openWindow({
+								url: '../ocr/ocr.html'
+							})
+							break;
+						case 'mac':
+							mui.openWindow({
+								url: '../mac/mac.html'
+							})
+							break;
+						case 'whois':
+							mui.openWindow({
+								url: '../whois/whois.html'
+							})
+							break;
 					}
 				}
 			}

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <title></title>
+	    <script src="../../js/mui.min.js"></script>
+	    <script src="../../js/vue.js"></script>
+	    <script src="../../js/vue-resource.min.js"></script>
+		<script src="../../js/vue-router.min.js"></script>
+	    <script src="../../js/conf.js"></script>
+	    <!--<script src="../../js/common.js"></script>-->
+	    <script src="../../js/mui.picker.min.js"></script>
+	    <script src="../../js/mui.poppicker.js"></script>
+		<script src="../../js/loading.js"></script>
+		<script src="../../js/compress.js"></script>
+	    <link href="../../css/mui.min.css" rel="stylesheet"/>
+	    <link href="../../css/mui.picker.min.css" rel="stylesheet" />
+	    <link href="../../css/mui.poppicker.css" rel="stylesheet"/>
+		<link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8"/>
+		<link href="../../css/loading.css" rel="stylesheet" />
+	    <style>
+	    	.ocr-button {
+			width: 90px;
+			height: 90px;
+			line-height: 58px;
+			-moz-border-radius: 50%;
+			-webkit-border-radius: 50%;
+			border-radius: 50%;
+			font-size: 24px;
+			border-width: 1px;
+			border-style: solid;
+			border-color: #777;
+			background: transparent none repeat scroll 0% 0%;
+			margin: 0 auto;
+			background-color: green;
+		}
+	    </style>
+	    <script type="text/javascript" charset="utf-8">
+	      	mui.init();
+	    </script>
+	    
+	</head>
+	<body style="height:100%;width:100%;">
+		<div id="ocrApp" style="height:100%;width:100%;">
+			<div style="text-align: center; border:5px solid grey; height: 50%; width: 100%;" @click="openPic($event)">
+				<img :style="{'margin-top': marginTop + 'px', height: imgHeight, width: imgWidth}" :src="imgSrc" />	
+				<!-- img style="height: 100%; width: 100%" :src="imgSrc"  / -->
+			</div>
+			<div style="text-align: center; border:5px solid greenyellow; height: 50%;">
+				<button v-if="ocrBtnVis" style="margin-top: 30%;" type="button" class="ocr-button" @click="ocrMain">识别</button>
+				<li v-for="item in words">
+					{{ item.words }}
+				</li>
+			</div>
+			<div id="sheet1" class="mui-popover mui-popover-bottom mui-popover-action ">
+					<!-- 可选择菜单 -->
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell" @click="openCamera">
+							<a>相机</a>
+						</li>
+						<li class="mui-table-view-cell" @click="openAlbum">
+							<a>打开相册</a>
+						</li>
+					</ul>
+					<!-- 取消菜单 -->
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell">
+							<a href="#sheet1"><b>取消</b></a>
+						</li>
+					</ul>
+			</div>
+		</div>
+		
+	</body>
+	
+	<script>
+		var ocrApp = new Vue({
+			el: "#ocrApp",
+			data: {
+				width: "", //二分之一屏幕宽度
+				height: "", //二分之一屏幕高度
+				marginTop: "",
+				imgHeight: "",
+				imgWidth: "",
+				base64Str: "",
+				resp: {},
+				imgSrc: "../../image/menu/camera.png",
+				imgUrl: "",
+				imguploadFinish: "",
+				ocrBtnVis: true,
+				words:{}
+			},
+			methods: {
+				search: function() {
+					this.resp={}
+					mui.showLoading()
+					this.$http.get(serverUrl + "/freeController/ipSearch?ip=" + this.ip).then(
+							function(resp) {
+								var data = resp["data"]["data"]
+								this.resp = data
+								mui.hideLoading()
+							}
+						)
+				},
+				openPic: function(e) {
+					var name = e.currentTarget.name
+					this.curImg = name
+					mui('#sheet1').popover('toggle')
+					
+				},
+				openCamera: function(e) {
+					var _this = this
+					this.imguploadFinish = false
+					var c = plus.camera.getCamera();  
+					c.captureImage(function(e) {  
+						plus.io.resolveLocalFileSystemURL(e, function(entry) {  
+							_this.clearWords()
+							_this.imgUrl = entry.toLocalURL()  //拿到图片路径  
+							_this.imgSrc = _this.imgUrl
+							
+							_this.uploadImg()
+							
+							_this.marginTop = 0
+							var img = new Image()
+							img.src = _this.imgUrl
+							//如果较高,则高度设置为100%,否则宽度设置为100%
+							img.onload=function(){
+								img.height > img.width ? _this.imgHeight = "100%" : _this.imgWidth = "100%"
+								_this.img = img
+							};
+							
+						}, function(e) {  
+							console.log("读取拍照文件错误：" + e.message);  
+						});  
+					}, function(s) {  
+							console.log("error" + s);  
+					});
+					mui('#sheet1').popover('toggle')
+				},
+				openAlbum: function() {
+					var _this = this
+					// 从相册中选择图片  
+					plus.gallery.pick( function(e){
+						_this.clearWords()
+						
+						_this.imgUrl = e.files[0]
+						//_this.compressImg()
+						_this.zipCompress()
+						//_this.imgSrc = _this.imgUrl
+						_this.marginTop = 0
+						var img = new Image()
+						img.src = e.files[0]
+						//如果较高,则高度设置为100%,否则宽度设置为100%
+						img.onload=function(){
+							img.height > img.width ? _this.imgHeight = "100%" : _this.imgWidth = "100%"
+							_this.img = img
+						};
+						
+					}, function ( e ) {  
+						console.log( "取消选择图片" );  
+					},{  
+						filter: "image",  
+						multiple: true,  
+						maximum: 1,  
+						system: false,  
+						onmaxed: function() {  
+							plus.nativeUI.alert('最多只能选择1张图片');  
+						}  
+					}); 
+					
+					mui('#sheet1').popover('toggle')
+				},
+				
+				ocrMain: function() {
+					mui.showLoading("正在识别，请稍候", "div")
+					if (!this.imguploadFinish) {
+						alert("请先上传图片或等待图片上传完毕")
+						mui.hideLoading()
+						return
+					}
+					var params = {
+						imgUrl: this.imgSrc
+					};
+					this.$http.post("http://106.12.18.116/baidu/getOcrResult", params).then(
+						(response) => {
+							mui.hideLoading()
+							var resp = response["body"]
+							if (resp["code"] == "200") {
+								this.ocrBtnVis = false
+								this.words = resp["data"]
+								
+							} else {
+								alert("识别失败")
+							}
+						},
+						(error) => {
+							alert("识别失败")
+						}
+					)
+					
+				},
+				uploadImg: function(e) {
+					var _this = this
+					this.$http.get(serverUrl + "/compare/getUpToken").then(
+						function(resp) {
+							token = JSON.parse(resp['bodyText'])['uptoken']
+							var key = getGuid() + ".jpg"
+							var url = "http://upload.qiniu.com/"
+							var uploader = plus.uploader.createUpload(url,{},function(up,state){
+								alert(state)
+								if( state==200 ) {
+									
+									_this.imgUrl = "p8ocpvt3n.bkt.clouddn.com/" + key
+									_this.imguploadFinish = true
+								} else {
+									alert("上传失败",state);
+								}			
+							});
+							uploader.addData("key", key)
+							uploader.addData("token",token)
+							//uploader.addFile(_this.imgUrl, {"key":"file"})      // 固定值，千万不要改！！！！！！
+							uploader.addData("", imgSrc)
+							uploader.start()
+						}
+					)
+				},
+				clearWords: function(e) {
+					this.imguploadFinish = false
+					this.ocrBtnVis = true
+					this.words = {}
+				},
+				compressImg: function(e) {
+					var _this = this
+					lrz(this.imgUrl)
+						.then(function (rst) {
+							//alert(JSON.stringify(rst))
+							//alert(_this.imgSrc)
+							_this.imgSrc = rst.base64
+							_this.uploadImg()
+						})
+						.catch(function (err){
+							// 处理失败会执行
+							alert("error")
+						})
+						.always(function () {
+							// 不管是成功失败，都会执行
+						});
+				},
+				//压缩
+				zipCompress: function(e){
+					//var zipfile = "_doc/text11.zip";
+					//var targetPath = '_doc/dir/';
+					var zipfile = this.imgUrl
+					var targetPath = "../../image/menu/"
+					plus.zip.compress(targetPath,zipfile,
+						function() {
+							alert("Compress success!");
+						},function(error) {
+							alert("Compress error!");
+					});
+				}
+			},
+			created: function() {
+ 				//mui.showLoading("正在初始化，请稍候", "div")
+ 				this.width = document.body.clientWidth,
+ 				this.height = document.body.clientHeight,
+ 				this.marginTop = this.height / 4 - 64
+ 			}
+			
+		})
+
+	</script>
+</html>
